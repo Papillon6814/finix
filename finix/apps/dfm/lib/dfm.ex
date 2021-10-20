@@ -16,19 +16,24 @@ defmodule Dfm do
   end
   """
 
+  @type option() :: String.t() | integer()
+
   @redis_host "localhost"
   @redis_port 6379
 
-  defp conn() do
-    with {:ok, conn} <- Redix.start_link(host: @redis_host, port: @redis_port) do
+  defp conn(opts) do
+    host = Keyword.get(opts, :redis_host, @redis_host)
+    port = Keyword.get(opts, :redis_port, @redis_port)
+
+    with {:ok, conn} <- Redix.start_link(host: host, port: port) do
       conn
     else
-      error -> raise "Failed to connect to #{@redis_host}:#{@redis_port} #{error}"
+      error -> raise "Failed to connect to #{host}:#{port} #{error}"
     end
   end
 
-  def flushall() do
-    conn = conn()
+  def flushall(opts \\ []) do
+    conn = conn(opts)
     Redix.command(conn, ["FLUSHALL"])
 
     Logger.info("Flushed all")
@@ -37,9 +42,9 @@ defmodule Dfm do
   @doc """
   Initializes state of automaton.
   """
-  @spec initialize(String.t(), integer(), String.t()) :: Redix.Protocol.redis_value()
-  def initialize(key_name, db_index, initial_state) do
-    conn = conn()
+  @spec initialize(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  def initialize(key_name, db_index, initial_state, opts \\ []) do
+    conn = conn(opts)
     name = name(key_name)
 
     Redix.command!(conn, ["SELECT", db_index])
@@ -55,9 +60,9 @@ defmodule Dfm do
   @doc """
   Defines how automaton changes the state.
   """
-  @spec on(String.t(), integer(), String.t(), String.t(), String.t()) :: Redix.Protocol.redis_value()
-  def on(key_name, db_index, event, current_state, next_state) do
-    conn = conn()
+  @spec on(String.t(), integer(), String.t(), String.t(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  def on(key_name, db_index, event, current_state, next_state, opts \\ []) do
+    conn = conn(opts)
 
     Redix.command!(conn, ["SELECT", db_index])
     Redix.command!(conn, ["HSET", event_key(key_name, event), current_state, next_state])
@@ -66,9 +71,9 @@ defmodule Dfm do
   @doc """
   Removes a pattern of state change.
   """
-  @spec rm(String.t(), integer(), String.t()) :: Redix.Protocol.redis_value()
-  def rm(key_name, db_index, event) do
-    conn = conn()
+  @spec rm(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  def rm(key_name, db_index, event, opts \\ []) do
+    conn = conn(opts)
 
     Redix.command!(conn, ["SELECT", db_index])
     Redix.command!(conn, ["HDEL", event_key(key_name, event)])
@@ -77,17 +82,17 @@ defmodule Dfm do
   @doc """
   Return current state.
   """
-  @spec state(String.t(), integer()) :: Redix.Protocol.redis_value()
-  def state(key_name, db_index) do
-    conn = conn()
+  @spec state(String.t(), integer(), [option()]) :: Redix.Protocol.redis_value()
+  def state(key_name, db_index, opts \\ []) do
+    conn = conn(opts)
 
     Redix.command!(conn, ["SELECT", db_index])
     Redix.command!(conn, ["GET", name(key_name)])
   end
 
-  @spec send_event(String.t(), integer(), String.t()) :: Redix.Protocol.redis_value()
-  defp send_event(key_name, db_index, event) do
-    conn = conn()
+  @spec send_event(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  defp send_event(key_name, db_index, event, opts) do
+    conn = conn(opts)
 
     Redix.command!(conn, ["SELECT", db_index])
     Redix.command!(conn, ["EVAL", @script, 2, name(key_name), event_key(key_name, event)])
@@ -96,9 +101,9 @@ defmodule Dfm do
   @doc """
   Triggers state change.
   """
-  @spec trigger(String.t(), integer(), String.t()) :: {:ok, String.t()} | {:error, String.t()}
-  def trigger(key_name, db_index, event) do
-    [state, result] = send_event(key_name, db_index, event)
+  @spec trigger(String.t(), integer(), String.t(), [option()]) :: {:ok, String.t()} | {:error, String.t()}
+  def trigger(key_name, db_index, event, opts \\ []) do
+    [state, result] = send_event(key_name, db_index, event, opts)
     do_trigger(state, result)
   end
 
