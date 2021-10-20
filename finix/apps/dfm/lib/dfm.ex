@@ -96,9 +96,12 @@ defmodule Dfm do
   @doc """
   Triggers state change.
   """
-  @spec trigger(String.t(), integer(), String.t()) :: Redix.Protocol.redis_value()
+  @spec trigger(String.t(), integer(), String.t()) :: {:ok, String.t()} | {:error, String.t()}
   def trigger(key_name, db_index, event) do
-    result = send_event(key_name, db_index, event)
-    IO.inspect(result)
+    [state, result] = send_event(key_name, db_index, event)
+    do_trigger(state, result)
   end
+
+  defp do_trigger(state, nil), do: {:error, state}
+  defp do_trigger(state, _), do: {:ok, state}
 end
