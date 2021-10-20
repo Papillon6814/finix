@@ -3,7 +3,7 @@ defmodule DfmTest do
   doctest Dfm
 
   describe "dfm" do
-    test "just works" do
+    test "simple automaton" do
       Dfm.flushall()
 
       key_name = "user1"
@@ -16,6 +16,7 @@ defmodule DfmTest do
       trigger2 = "y"
       invalid_trigger = "invalid"
 
+      # NOTE: Define state changes
       Dfm.initialize(key_name, db_index, state1)
       Dfm.on(key_name, db_index, trigger1, state1, state2)
       Dfm.on(key_name, db_index, trigger1, state2, state3)
@@ -32,7 +33,7 @@ defmodule DfmTest do
       assert {:ok, state3} = Dfm.trigger(key_name, db_index, trigger2)
       assert Dfm.state(key_name, db_index) == state3
 
-      # NOTE: invalid patterns
+      # NOTE: Invalid patterns
       assert {:error, state3} = Dfm.trigger(key_name, db_index, trigger2)
       assert {:error, state3} = Dfm.trigger(key_name, db_index, invalid_trigger)
     end
