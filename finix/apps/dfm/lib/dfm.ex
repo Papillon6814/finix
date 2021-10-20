@@ -32,6 +32,10 @@ defmodule Dfm do
     end
   end
 
+  @doc """
+  Flush all data.
+  """
+  @spec flushall(keyword) :: :ok
   def flushall(opts \\ []) do
     conn = conn(opts)
     Redix.command(conn, ["FLUSHALL"])
