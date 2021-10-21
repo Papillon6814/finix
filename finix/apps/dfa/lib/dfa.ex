@@ -1,7 +1,7 @@
 defmodule Dfa do
   @moduledoc """
   Documentation for `Dfa`.
-  Dfa module helps you define your original deterministic finite automaton.
+  Dfa module helps you define your original deterministic finite automaton by building it on redis by a given name.
 
   ## Usage
   ```elixir
