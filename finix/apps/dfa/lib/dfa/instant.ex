@@ -1,19 +1,19 @@
-defmodule Dfa do
+defmodule Dfa.Instant do
   @moduledoc """
   Documentation for `Dfa`.
-  Dfa module helps you define your original deterministic finite automaton by building it on redis by a given name.
+  Dfa.Instant module helps you define your original deterministic finite automaton by building it on redis by a given name.
 
   ## Usage
   ```elixir
-  Dfa.initialize!(key_name, db_index, state1)
-  Dfa.on!(key_name, db_index, trigger1, state1, state2)
-  Dfa.on!(key_name, db_index, trigger1, state2, state3)
-  Dfa.on!(key_name, db_index, trigger1, state3, state1)
-  Dfa.on!(key_name, db_index, trigger2, state1, state3)
+  Dfa.Instant.initialize!(key_name, db_index, state1)
+  Dfa.Instant.on!(key_name, db_index, trigger1, state1, state2)
+  Dfa.Instant.on!(key_name, db_index, trigger1, state2, state3)
+  Dfa.Instant.on!(key_name, db_index, trigger1, state3, state1)
+  Dfa.Instant.on!(key_name, db_index, trigger2, state1, state3)
 
-  assert Dfa.state!(key_name, db_index) == state1
-  assert {:ok, state3} = Dfa.trigger!(key_name, db_index, trigger1)
-  assert Dfa.state!(key_name, db_index) == state2
+  assert Dfa.Instant.state!(key_name, db_index) == state1
+  assert {:ok, state3} = Dfa.Instant.trigger!(key_name, db_index, trigger1)
+  assert Dfa.Instant.state!(key_name, db_index) == state2
   ```
   """
 
@@ -70,7 +70,7 @@ defmodule Dfa do
   end
 
   @spec name(String.t()) :: String.t()
-  defp name(key_name), do: "finite:#{key_name}"
+  defp name(key_name), do: "finite_instant:#{key_name}"
 
   @spec event_key(String.t(), String.t()) :: String.t()
   defp event_key(key_name, event), do: "#{key_name}:#{event}"
