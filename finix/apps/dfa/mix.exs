@@ -1,4 +1,4 @@
-defmodule Dfm.MixProject do
+defmodule Dfa.MixProject do
   use Mix.Project
 
   def project do
