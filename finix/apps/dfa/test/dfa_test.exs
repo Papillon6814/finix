@@ -2,7 +2,7 @@ defmodule DfaTest do
   use ExUnit.Case
   doctest Dfa
 
-  describe "dfm" do
+  describe "dfa" do
     test "simple automaton" do
       Dfa.flushall()
 

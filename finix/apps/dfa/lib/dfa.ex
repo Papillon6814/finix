@@ -1,6 +1,20 @@
 defmodule Dfa do
   @moduledoc """
   Documentation for `Dfa`.
+  Dfa module helps you define your original deterministic finite automaton.
+
+  ## Usage
+  ```elixir
+  Dfa.initialize!(key_name, db_index, state1)
+  Dfa.on!(key_name, db_index, trigger1, state1, state2)
+  Dfa.on!(key_name, db_index, trigger1, state2, state3)
+  Dfa.on!(key_name, db_index, trigger1, state3, state1)
+  Dfa.on!(key_name, db_index, trigger2, state1, state3)
+
+  assert Dfa.state!(key_name, db_index) == state1
+  assert {:ok, state3} = Dfa.trigger!(key_name, db_index, trigger1)
+  assert Dfa.state!(key_name, db_index) == state2
+  ```
   """
 
   require Logger
@@ -35,7 +49,7 @@ defmodule Dfa do
   @doc """
   Flush all data.
   """
-  @spec flushall(keyword) :: :ok
+  @spec flushall([option()]) :: :ok
   def flushall(opts \\ []) do
     conn = conn(opts)
     Redix.command(conn, ["FLUSHALL"])
