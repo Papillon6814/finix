@@ -50,7 +50,7 @@ defmodule Dfa.Predefined do
   @spec machine_event_key(String.t(), String.t()) :: String.t()
   defp machine_event_key(machine_name, event), do: "#{machine_name}:#{event}"
 
-  @spec on!(String.t(), integer(), String.t(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @spec on!(String.t(), integer(), String.t(), String.t(), String.t(), [option()]) :: Redix.Protocol.redis_value()
   def on!(machine_name, db_index, event, current_state, next_state, opts \\ []) do
     conn = conn(opts)
 

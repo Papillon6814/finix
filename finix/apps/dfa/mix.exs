@@ -4,7 +4,7 @@ defmodule Dfa.MixProject do
   def project do
     [
       app: :dfa,
-      version: "0.1.2",
+      version: "0.1.3",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -39,7 +39,8 @@ defmodule Dfa.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       # {:sibling_app_in_umbrella, in_umbrella: true}
       {:ex_doc, "~> 0.22.0", only: :dev, runtime: false},
-      {:redix, "~> 1.1"}
+      {:redix, "~> 1.1"},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 end
