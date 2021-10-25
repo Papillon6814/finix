@@ -111,4 +111,19 @@ defmodule Dfa.Predefined do
 
   defp do_trigger(state, nil), do: {:error, state}
   defp do_trigger(state, _), do: {:ok, state}
+
+  @doc """
+  Check if a given machine name exists.
+  """
+  @spec exists?(String.t(), integer(), [option()]) :: boolean()
+  def exists?(machine_name, db_index, opts \\ []) do
+    conn = conn(opts)
+
+    Redix.command!(conn, ["SELECT", db_index])
+
+    conn
+    |> Redix.command!(["KEYS", "#{machine_name}*"])
+    |> length()
+    |> Kernel.!=(0)
+  end
 end
