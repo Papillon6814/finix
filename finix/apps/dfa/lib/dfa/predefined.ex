@@ -32,6 +32,9 @@ defmodule Dfa.Predefined do
     end
   end
 
+  @doc """
+  Generate an instance of a state machine.
+  """
   @spec initialize!(String.t(), String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
   def initialize!(instance_name, machine_name, db_index, initial_state, opts \\ []) do
     conn = conn(opts)
@@ -50,6 +53,9 @@ defmodule Dfa.Predefined do
   @spec machine_event_key(String.t(), String.t()) :: String.t()
   defp machine_event_key(machine_name, event), do: "#{machine_name}:#{event}"
 
+  @doc """
+  Defines a state change event.
+  """
   @spec on!(String.t(), integer(), String.t(), String.t(), String.t(), [option()]) :: Redix.Protocol.redis_value()
   def on!(machine_name, db_index, event, current_state, next_state, opts \\ []) do
     conn = conn(opts)
@@ -58,6 +64,9 @@ defmodule Dfa.Predefined do
     Redix.command!(conn, ["HSET", machine_event_key(machine_name, event), current_state, next_state])
   end
 
+  @doc """
+  Removes a state change event.
+  """
   @spec rm!(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
   def rm!(machine_name, db_index, event, opts \\ []) do
     conn = conn(opts)
@@ -66,6 +75,9 @@ defmodule Dfa.Predefined do
     Redix.command!(conn, ["HDEL", machine_event_key(machine_name, event)])
   end
 
+  @doc """
+  Load a state.
+  """
   @spec state!(String.t(), integer(), [option()]) :: Redix.Protocol.redis_value()
   def state!(instance_name, db_index, opts \\ []) do
     conn = conn(opts)
@@ -88,6 +100,9 @@ defmodule Dfa.Predefined do
     Redix.command!(conn, ["EVAL", @script, 2, instance_string_key(instance_name), machine_name])
   end
 
+  @doc """
+  Triggers an event.
+  """
   @spec trigger!(String.t(), integer(), String.t(), [option()]) :: {:ok, String.t()} | {:error, String.t()}
   def trigger!(instance_name, db_index, event, opts \\ []) do
     [state, result] = send_event!(instance_name, db_index, event, opts)
