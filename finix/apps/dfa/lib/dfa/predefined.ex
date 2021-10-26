@@ -119,11 +119,11 @@ defmodule Dfa.Predefined do
   def exists?(machine_name, db_index, opts \\ []) do
     conn = conn(opts)
 
-    Redix.command!(conn, ["SELECT", db_index])
-
-    conn
-    |> Redix.command!(["KEYS", "#{machine_name}*"])
-    |> length()
-    |> Kernel.!=(0)
+    with {:ok, _} <- Redix.command(conn, ["SELECT", db_index]),
+         {:ok, keys} <- Redix.command(conn, ["KEYS", "#{machine_name}*"]) do
+      keys != []
+    else
+      _ -> false
+    end
   end
 end
