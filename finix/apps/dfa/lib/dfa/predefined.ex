@@ -16,7 +16,8 @@ defmodule Dfa.Predefined do
   end
   """
 
-  @type option() :: String.t() | integer()
+  # FIXME: not proper for option. it should be keyword list.
+  @type option() :: String.t() | integer() | nil
 
   @redis_host "localhost"
   @redis_port 6379
