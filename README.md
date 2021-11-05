@@ -1,3 +1,5 @@
+https://img.shields.io/hexpm/v/dfa?style=for-the-badge
+
 # finix
 redis-based state machine implementation in Elixir.
 
