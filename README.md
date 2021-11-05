@@ -1,4 +1,4 @@
-https://img.shields.io/hexpm/v/dfa?style=for-the-badge
+[![hex.pm version](https://img.shields.io/hexpm/v/dfa.svg)](https://hex.pm/packages/dfa)
 
 # finix
 redis-based state machine implementation in Elixir.
