@@ -1,6 +1,7 @@
-# Dfa
+[![hex.pm version](https://img.shields.io/hexpm/v/dfa.svg)](https://hex.pm/packages/dfa)
 
-**TODO: Add description**
+# Dfa
+Finite state machine implementation on redis.
 
 ## Installation
 
