@@ -61,7 +61,7 @@ defmodule Dfa.Instant do
   @doc """
   Initializes state of automaton.
   """
-  @impl Dfa
+  @spec initialize!(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
   def initialize!(key_name, db_index, initial_state, opts \\ []) do
     conn = conn(opts)
     name = name(key_name)

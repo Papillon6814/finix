@@ -37,7 +37,7 @@ defmodule Dfa.Predefined do
   @doc """
   Generate an instance of a state machine.
   """
-  @impl Dfa
+  @spec initialize!(String.t(), String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
   def initialize!(instance_name, machine_name, db_index, initial_state, opts \\ []) do
     conn = conn(opts)
 
