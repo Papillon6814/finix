@@ -3,6 +3,7 @@ defmodule Dfa.Predefined do
   Dfa.Predefined only predefines a behavior of state machine.
   The state machine here consists of `machine `and `instance`.
   """
+  @behaviour Dfa
 
   @script """
   local curr = redis.call("GET", KEYS[1])
@@ -36,7 +37,7 @@ defmodule Dfa.Predefined do
   @doc """
   Generate an instance of a state machine.
   """
-  @spec initialize!(String.t(), String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @impl Dfa
   def initialize!(instance_name, machine_name, db_index, initial_state, opts \\ []) do
     conn = conn(opts)
 
@@ -57,7 +58,7 @@ defmodule Dfa.Predefined do
   @doc """
   Defines a state change event.
   """
-  @spec on!(String.t(), integer(), String.t(), String.t(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @impl Dfa
   def on!(machine_name, db_index, event, current_state, next_state, opts \\ []) do
     conn = conn(opts)
 
@@ -68,7 +69,7 @@ defmodule Dfa.Predefined do
   @doc """
   Removes a state change event.
   """
-  @spec rm!(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @impl Dfa
   def rm!(machine_name, db_index, event, opts \\ []) do
     conn = conn(opts)
 
@@ -79,7 +80,7 @@ defmodule Dfa.Predefined do
   @doc """
   Load a state.
   """
-  @spec state!(String.t(), integer(), [option()]) :: Redix.Protocol.redis_value()
+  @impl Dfa
   def state!(instance_name, db_index, opts \\ []) do
     conn = conn(opts)
 
@@ -104,7 +105,7 @@ defmodule Dfa.Predefined do
   @doc """
   Triggers an event.
   """
-  @spec trigger!(String.t(), integer(), String.t(), [option()]) :: {:ok, String.t()} | {:error, String.t()}
+  @impl Dfa
   def trigger!(instance_name, db_index, event, opts \\ []) do
     [state, result] = send_event!(instance_name, db_index, event, opts)
     do_trigger(state, result)

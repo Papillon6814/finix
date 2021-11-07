@@ -27,18 +27,18 @@ defmodule Dfa.InstantTest do
         Dfa.Instant.on!(key_name, db_index, trigger2, state1, state3)
 
         assert Dfa.Instant.state!(key_name, db_index) == state1
-        assert {:ok, state3} = Dfa.Instant.trigger!(key_name, db_index, trigger1)
+        assert {:ok, ^state2} = Dfa.Instant.trigger!(key_name, db_index, trigger1)
         assert Dfa.Instant.state!(key_name, db_index) == state2
-        assert {:ok, state3} = Dfa.Instant.trigger!(key_name, db_index, trigger1)
+        assert {:ok, ^state3} = Dfa.Instant.trigger!(key_name, db_index, trigger1)
         assert Dfa.Instant.state!(key_name, db_index) == state3
-        assert {:ok, state3} = Dfa.Instant.trigger!(key_name, db_index, trigger1)
+        assert {:ok, ^state1} = Dfa.Instant.trigger!(key_name, db_index, trigger1)
         assert Dfa.Instant.state!(key_name, db_index) == state1
-        assert {:ok, state3} = Dfa.Instant.trigger!(key_name, db_index, trigger2)
+        assert {:ok, ^state3} = Dfa.Instant.trigger!(key_name, db_index, trigger2)
         assert Dfa.Instant.state!(key_name, db_index) == state3
 
         # NOTE: Invalid patterns
-        assert {:error, state3} = Dfa.Instant.trigger!(key_name, db_index, trigger2)
-        assert {:error, state3} = Dfa.Instant.trigger!(key_name, db_index, invalid_trigger)
+        assert {:error, ^state3} = Dfa.Instant.trigger!(key_name, db_index, trigger2)
+        assert {:error, ^state3} = Dfa.Instant.trigger!(key_name, db_index, invalid_trigger)
       end)
     end
   end

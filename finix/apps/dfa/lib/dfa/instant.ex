@@ -16,6 +16,7 @@ defmodule Dfa.Instant do
   assert Dfa.Instant.state!(key_name, db_index) == state2
   ```
   """
+  @behaviour Dfa
 
   require Logger
 
@@ -60,7 +61,7 @@ defmodule Dfa.Instant do
   @doc """
   Initializes state of automaton.
   """
-  @spec initialize!(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @impl Dfa
   def initialize!(key_name, db_index, initial_state, opts \\ []) do
     conn = conn(opts)
     name = name(key_name)
@@ -78,7 +79,7 @@ defmodule Dfa.Instant do
   @doc """
   Defines how automaton changes the state.
   """
-  @spec on!(String.t(), integer(), String.t(), String.t(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @impl Dfa
   def on!(key_name, db_index, event, current_state, next_state, opts \\ []) do
     conn = conn(opts)
 
@@ -89,7 +90,7 @@ defmodule Dfa.Instant do
   @doc """
   Removes a pattern of state change.
   """
-  @spec rm!(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @impl Dfa
   def rm!(key_name, db_index, event, opts \\ []) do
     conn = conn(opts)
 
@@ -100,7 +101,7 @@ defmodule Dfa.Instant do
   @doc """
   Return current state.
   """
-  @spec state!(String.t(), integer(), [option()]) :: Redix.Protocol.redis_value()
+  @impl Dfa
   def state!(key_name, db_index, opts \\ []) do
     conn = conn(opts)
 
@@ -119,7 +120,7 @@ defmodule Dfa.Instant do
   @doc """
   Triggers state change.
   """
-  @spec trigger!(String.t(), integer(), String.t(), [option()]) :: {:ok, String.t()} | {:error, String.t()}
+  @impl Dfa
   def trigger!(key_name, db_index, event, opts \\ []) do
     [state, result] = send_event!(key_name, db_index, event, opts)
     do_trigger(state, result)
