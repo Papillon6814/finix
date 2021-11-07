@@ -4,8 +4,8 @@ defmodule Dfa do
   """
   @type option() :: String.t() | integer() | nil
 
-  # @callback initialize!(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
-  # @callback initialize!(String.t(), String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @callback initialize!(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
+  @callback initialize!(String.t(), String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
 
   @doc """
   Defines a state change event.
@@ -27,5 +27,5 @@ defmodule Dfa do
   """
   @callback trigger!(String.t(), integer(), String.t(), [option()]) :: {:ok, String.t()} | {:error, String.t()}
 
-  # @optional_callbacks initialize!: 4, initialize!: 5
+  @optional_callbacks initialize!: 4, initialize!: 5
 end
