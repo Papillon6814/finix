@@ -46,6 +46,9 @@ defmodule Dfa.PredefinedTest do
 
       assert Predefined.exists?(machine_name, db_index)
       refute Predefined.exists?("invalid name", db_index)
+
+      invalid_instance = "invld"
+      refute Predefined.instance_exists?(invalid_instance, db_index)
     end
   end
 end

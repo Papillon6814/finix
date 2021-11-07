@@ -128,4 +128,15 @@ defmodule Dfa.Predefined do
       _ -> false
     end
   end
+
+  def instance_exists?(instance_name, db_index, opts \\ []) do
+    conn = conn(opts)
+
+    with {:ok, _} <- Redix.command(conn, ["SELECT", db_index]),
+         {:ok, val} <- Redix.command(conn, ["GET", instance_string_key(instance_name)]) do
+      !is_nil(val)
+    else
+      _ -> false
+    end
+  end
 end
