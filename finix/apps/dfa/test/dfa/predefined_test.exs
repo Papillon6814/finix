@@ -49,6 +49,10 @@ defmodule Dfa.PredefinedTest do
 
       invalid_instance = "invld"
       refute Predefined.instance_exists?(invalid_instance, db_index)
+
+      assert Predefined.instance_exists?(instance_name1, db_index)
+      Predefined.deinitialize!(instance_name1, db_index)
+      refute Predefined.instance_exists?(instance_name1, db_index)
     end
   end
 end

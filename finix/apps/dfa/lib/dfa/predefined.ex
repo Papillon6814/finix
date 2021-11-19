@@ -56,6 +56,22 @@ defmodule Dfa.Predefined do
   defp machine_event_key(machine_name, event), do: "#{machine_name}:#{event}"
 
   @doc """
+  Deletes an instance.
+  """
+  @spec deinitialize!(String.t(), integer(), [Dfa.option()]) :: Redix.Protocol.redis_value() | nil
+  def deinitialize!(instance_name, db_index, opts \\ []) do
+    if __MODULE__.instance_exists?(instance_name, db_index, opts) do
+      conn = conn(opts)
+
+      Redix.command!(conn, ["SELECT", db_index])
+      Redix.command!(conn, ["SPOP", instance_set_key(instance_name), 1])
+      Redix.command!(conn, ["DEL", instance_string_key(instance_name)])
+    else
+      nil
+    end
+  end
+
+  @doc """
   Defines a state change event.
   """
   @impl Dfa
@@ -121,7 +137,7 @@ defmodule Dfa.Predefined do
   def exists?(machine_name, db_index, opts \\ []) do
     conn = conn(opts)
 
-    with {:ok, _} <- Redix.command(conn, ["SELECT", db_index]),
+    with {:ok, _}    <- Redix.command(conn, ["SELECT", db_index]),
          {:ok, keys} <- Redix.command(conn, ["KEYS", "#{machine_name}*"]) do
       keys != []
     else
@@ -129,10 +145,13 @@ defmodule Dfa.Predefined do
     end
   end
 
+  @doc """
+  Check if given instance name exists.
+  """
   def instance_exists?(instance_name, db_index, opts \\ []) do
     conn = conn(opts)
 
-    with {:ok, _} <- Redix.command(conn, ["SELECT", db_index]),
+    with {:ok, _}   <- Redix.command(conn, ["SELECT", db_index]),
          {:ok, val} <- Redix.command(conn, ["GET", instance_string_key(instance_name)]) do
       !is_nil(val)
     else
