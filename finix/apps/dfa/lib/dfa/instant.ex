@@ -31,14 +31,12 @@ defmodule Dfa.Instant do
   end
   """
 
-  @type option() :: String.t() | integer()
-
   @redis_host "localhost"
   @redis_port 6379
 
-  defp conn(opts) do
-    host = Keyword.get(opts, :redis_host, @redis_host)
-    port = Keyword.get(opts, :redis_port, @redis_port)
+  defp conn() do
+    host = Application.get_env(:dfa, :redis_host) || @redis_host
+    port = Application.get_env(:dfa, :redis_port) || @redis_port
 
     with {:ok, conn} <- Redix.start_link(host: host, port: port) do
       conn
@@ -50,9 +48,9 @@ defmodule Dfa.Instant do
   @doc """
   Flush all data.
   """
-  @spec flushall([option()]) :: :ok
-  def flushall(opts \\ []) do
-    conn = conn(opts)
+  @spec flushall() :: :ok
+  def flushall() do
+    conn = conn()
     Redix.command(conn, ["FLUSHALL"])
 
     Logger.info("Flushed all")
@@ -62,8 +60,8 @@ defmodule Dfa.Instant do
   Initializes state of automaton.
   """
   @impl Dfa
-  def initialize!(key_name, db_index, initial_state, opts \\ []) do
-    conn = conn(opts)
+  def initialize!(key_name, db_index, initial_state) do
+    conn = conn()
     name = name(key_name)
 
     Redix.command!(conn, ["SELECT", db_index])
@@ -80,8 +78,8 @@ defmodule Dfa.Instant do
   Defines how automaton changes the state.
   """
   @impl Dfa
-  def on!(key_name, db_index, event, current_state, next_state, opts \\ []) do
-    conn = conn(opts)
+  def on!(key_name, db_index, event, current_state, next_state) do
+    conn = conn()
 
     Redix.command!(conn, ["SELECT", db_index])
     Redix.command!(conn, ["HSET", event_key(key_name, event), current_state, next_state])
@@ -91,8 +89,8 @@ defmodule Dfa.Instant do
   Removes a pattern of state change.
   """
   @impl Dfa
-  def rm!(key_name, db_index, event, opts \\ []) do
-    conn = conn(opts)
+  def rm!(key_name, db_index, event) do
+    conn = conn()
 
     Redix.command!(conn, ["SELECT", db_index])
     Redix.command!(conn, ["HDEL", event_key(key_name, event)])
@@ -102,16 +100,16 @@ defmodule Dfa.Instant do
   Return current state.
   """
   @impl Dfa
-  def state!(key_name, db_index, opts \\ []) do
-    conn = conn(opts)
+  def state!(key_name, db_index) do
+    conn = conn()
 
     Redix.command!(conn, ["SELECT", db_index])
     Redix.command!(conn, ["GET", name(key_name)])
   end
 
-  @spec send_event!(String.t(), integer(), String.t(), [option()]) :: Redix.Protocol.redis_value()
-  defp send_event!(key_name, db_index, event, opts) do
-    conn = conn(opts)
+  @spec send_event!(String.t(), integer(), String.t()) :: Redix.Protocol.redis_value()
+  defp send_event!(key_name, db_index, event) do
+    conn = conn()
 
     Redix.command!(conn, ["SELECT", db_index])
     Redix.command!(conn, ["EVAL", @script, 2, name(key_name), event_key(key_name, event)])
@@ -121,11 +119,11 @@ defmodule Dfa.Instant do
   Triggers state change.
   """
   @impl Dfa
-  def trigger!(key_name, db_index, event, opts \\ []) do
-    [state, result] = send_event!(key_name, db_index, event, opts)
+  def trigger!(key_name, db_index, event) do
+    [state, result] = send_event!(key_name, db_index, event)
     do_trigger(state, result)
   end
 
   defp do_trigger(state, nil), do: {:error, state}
-  defp do_trigger(state, _), do: {:ok, state}
+  defp do_trigger(state, _),   do: {:ok, state}
 end

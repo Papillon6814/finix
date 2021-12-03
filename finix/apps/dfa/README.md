@@ -16,6 +16,12 @@ def deps do
 end
 ```
 
+**config.exs(dev.exs or prod.exs)**
+```elixir
+config :dfa, :redis_host, "localhost"
+config :dfa, :redis_port, 6379
+```
+
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/dfa](https://hexdocs.pm/dfa).
