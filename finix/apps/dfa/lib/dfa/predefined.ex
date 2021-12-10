@@ -143,7 +143,7 @@ defmodule Dfa.Predefined do
   end
 
   @doc """
-  Check if given instance name exists.
+  Check if the given instance name exists.
   """
   def instance_exists?(instance_name, db_index) do
     conn = conn()
